@@ -76,7 +76,7 @@
             </template>
           </draggable>
           <BtnAction
-            @click="true"
+            @click="handleUpload"
             :cta="true"
             :label="$t(i18nMap.components.modal_upload_images.upload)"
             fontSize="sm"
@@ -99,15 +99,26 @@ import draggable from "vuedraggable";
 import { i18nMap } from "~/types/i18n-map";
 import { IconMap } from "~/types/icon-map";
 
-const { files, handleFiles, removeFile } = useFileManager();
+const { files, handleFiles, removeFile, uploadFiles } = useFileManager();
 
 export interface Props {
   uploadLimit?: number;
+  organizationId?: string;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   uploadLimit: 10,
+  organizationId: undefined,
 });
 
 const modalName = "ModalUploadImages";
+
+const emit = defineEmits(["upload-complete"]);
+
+const handleUpload = async () => {
+  await uploadFiles(props.organizationId);
+  const modals = useModals();
+  modals.closeModal(modalName);
+  emit("upload-complete");
+};
 </script>
